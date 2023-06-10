@@ -5,11 +5,12 @@
 }
 @font-face{
     font-family: 'police';
-    src: url('police/poppins-Light.ttf') format('truetype');
+    src: url('../police/poppins-Light.ttf') format('truetype');
 }
 header h1{
     color: white;
     text-align: center;
+    font-size: 60px;
 }
 .cote{
     display: flex;

@@ -6,7 +6,7 @@
 }
 @font-face{
     font-family: 'police';
-    src: url('police/poppins-Light.ttf') format('truetype');
+    src: url('../police/poppins-Light.ttf') format('truetype');
 }
 
 #room_cont{
