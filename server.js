@@ -13,7 +13,10 @@ const pool=new Pool({
     user:'postgres',
     password:'motdepasse'
 });
+//current date
+const today = new Date();
 
+let dateTime=`${today.getFullYear()}-${today.getMonth()}-${today.getDate()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
 
 
 app.use(express.static(path.join(__dirname, 'chat')));
@@ -47,7 +50,7 @@ socket.on("login",function(data){
 
 //database
 //printing all previous messages
-const selectQuery='select sender_name,content,is_update from messages where room_name=$1'
+const selectQuery='select sender_name,content,is_update,date from messages where room_name=$1'
 const value=[currentRoom]
 pool.query(selectQuery,value,(err,result)=>{
     if(err)
@@ -90,15 +93,14 @@ socket.on("typing",function(data){
 socket.on("stopTyping",function(){
     socket.broadcast.to(currentRoom).emit("stopTyping")
 })
-//send file
-socket.on("file",function(formData){
-    socket.broadcast.to(currentRoom).emit("file",formData.file)
-})
+
 // Send message to all connected users
 socket.on("chat",function(message){
-    socket.broadcast.to(currentRoom).emit("chat",message);
-const insert='insert into messages(room_name,sender_name,content) values($1,$2,$3)'
-const values=[currentRoom,name,message.text]
+  
+ socket.broadcast.to(currentRoom).emit("chat",message);
+      //adding all messages to the database
+const insert='insert into messages(room_name,sender_name,content,"date") values($1,$2,$3,$4)'
+const values=[currentRoom,name,message.text,dateTime]
 pool.query(insert,values,(err,result)=>{
     if(err)
     console.log("erreur:",err)
@@ -117,6 +119,7 @@ socket.on("leave",function(username){
     io.to(currentRoom).emit("userList",Object.values(userList))
     console.log(username+"has desconnected");
     console.table(userList)
+    
     const insert='insert into messages(room_name,sender_name,content,is_update) values($1,$2,$3,$4)'
     const values=[currentRoom,name,"has left the conversation",true];
     pool.query(insert,values,(err,result)=>{
@@ -131,7 +134,7 @@ socket.on("leave",function(username){
 })
 
 
-let port=3001
+let port=3009
 server.listen(port,()=>{
     console.log("listen to port"+port)
     

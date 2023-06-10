@@ -13,6 +13,7 @@ let mess;
 let leave=document.getElementById("leave")
 
 const today=new Date;
+let date=`${today.getFullYear()}-${today.getMonth()}-${today.getDate()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
 
 
 
@@ -23,16 +24,16 @@ const today=new Date;
    var mode=document.getElementById("mode")
 
 mode.addEventListener("click",function(){
-   var all=document.querySelector("main")
+   var body=document.querySelector(".body")
     var cont=document.getElementById("container");
     var roomCont=document.getElementById("room_cont")
     cont.classList.toggle("black")
     messageContainer.classList.toggle("sombre")
-   
+  
     if(messageContainer.classList.contains("sombre")){
         cont.style.color="white"
         mode.innerHTML=`<img src="image/soleil.png" alt="">`
-        
+        body.style.background="linear-gradient(180deg,rgb(148, 143, 143),rgb(54, 53, 53))"
 
     }
    
@@ -40,6 +41,8 @@ mode.addEventListener("click",function(){
         messageContainer.style.color="black"
         cont.style.color="black"
         mode.innerHTML=`<img src="image/icons8-lune-91.png" alt="">`
+        body.style.background="linear-gradient(180deg,rgb(212, 204, 204),rgb(225, 218, 218))"
+
     }
   
 
@@ -102,11 +105,13 @@ if(mess.trim()!=""){
   
    renderMessage("mine",{
     name:use,
-    text:mess
+    text:mess,
+    dateTime:date
 })
 socket.emit("chat",{
     name:use,
-    text:mess
+    text:mess,
+    dateTime:date
 })
     input.value=''
 }
@@ -124,7 +129,7 @@ function renderMessage(type,msg){
         el.innerHTML=`
         <div class="sender_name">you</div>
         <div class="sending">${msg.text}</div>
-    
+        <div class="date">${msg.dateTime}</div>
   
         `
         containeMessage.appendChild(el)
@@ -136,6 +141,8 @@ function renderMessage(type,msg){
         el.innerHTML=`
         <div class="sender_name">${msg.name}</div>
         <div class="sending">${msg.text}</div>
+        <div class="date">${msg.dateTime}</div>
+
         
         `
         
@@ -204,8 +211,8 @@ socket.on("existingMessages",function(message){
         if(element.sender_name==use&&!element.is_update){
             renderMessage("mine",{
                 name:element.sender_name,
-                text:element.content
-                
+                text:element.content,
+                dateTime:element.date
                 
             })
             
@@ -219,13 +226,14 @@ socket.on("existingMessages",function(message){
         else if(element.is_update&&element.sender_name==use){
             existingUpdate({
                 name:'you',
-                text:"you have joined the chat"
+                text:" have joined the chat"
             })
         }
         else{
             renderMessage("other",{
                 name:element.sender_name,
-                text:element.content
+                text:element.content,
+                dateTime:element.date
             })
         }
        
